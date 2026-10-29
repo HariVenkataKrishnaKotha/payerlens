@@ -66,53 +66,53 @@ Verified from the CMS fact sheet and 42 CFR 422.122 (links in §10): decision ti
 
 ```mermaid
 flowchart LR
-    subgraph Synthetic data
-        SY[Synthea v4.0.0<br/>CSV export]
+    subgraph SYNTH["Synthetic data"]
+        SY["Synthea v4.0.0<br/>CSV export"]
     end
 
     subgraph Seeder[".NET 10 Seeder (console)"]
-        SD[Transform CSV →<br/>claims / members / providers /<br/>prior auths (CMS-0057-F fields) +<br/>labeled FWA scenarios]
+        SD["Transform CSV →<br/>claims / members / providers /<br/>prior auths (CMS-0057-F fields) +<br/>labeled FWA scenarios"]
     end
 
     subgraph Mongo["MongoDB Atlas Free (MongoDB 8.0)"]
-        M1[(members)]
-        M2[(providers)]
-        M3[(claims)]
-        M4[(prior_authorizations)]
+        M1[("members")]
+        M2[("providers")]
+        M3[("claims")]
+        M4[("prior_authorizations")]
     end
 
     subgraph DBX["Databricks Free Edition (serverless)"]
-        V[/UC Volume<br/>payerlens_raw/]
-        B[(bronze)]
-        S[(silver)]
-        G[(gold)]
-        J{{Lakeflow Job<br/>nightly}}
+        V[/"UC Volume<br/>payerlens_raw"/]
+        B[("bronze")]
+        S[("silver")]
+        G[("gold")]
+        J{{"Lakeflow Job<br/>nightly"}}
     end
 
     subgraph Neo4j["Neo4j AuraDB Free"]
-        N[(Provider · Member · Organization<br/>REFERRED · TREATED_BY · WORKS_AT)]
+        N[("Provider · Member · Organization<br/>REFERRED · TREATED_BY · WORKS_AT")]
     end
 
     subgraph API["PayerLens.Api (.NET 10 Minimal API)"]
-        E1[/members, claims, providers,<br/>prior-authorizations/at-risk/]
-        E2[/analytics incl.<br/>prior-auth/cms0057/]
-        E3[/graph/]
-        O[OpenAPI 3.1 + Scalar]
+        E1[/"members, claims, providers,<br/>prior-authorizations/at-risk"/]
+        E2[/"analytics incl.<br/>prior-auth/cms0057"/]
+        E3[/"graph"/]
+        O["OpenAPI 3.1 + Scalar"]
     end
 
-    EV[Seeder --evaluate-fwa<br/>precision / recall / F1]
+    EV["Seeder --evaluate-fwa<br/>precision / recall / F1"]
 
     SY --> SD
-    SD -->|MongoDB.Driver 3.13| Mongo
-    SD -->|JSON Lines export| V
-    SD -->|Neo4j.Driver 6.4 batched MERGE| N
+    SD -->|"MongoDB.Driver 3.13"| Mongo
+    SD -->|"JSON Lines export"| V
+    SD -->|"Neo4j.Driver 6.4 batched MERGE"| N
     V --> B --> S --> G
-    J -.orchestrates.-> B
+    J -. "orchestrates" .-> B
     J -.-> S
     J -.-> G
     Mongo --> E1
     Mongo --> E2
-    G -->|SQL Statement Execution API| E2
+    G -->|"SQL Statement Execution API"| E2
     N --> E3
     N --> EV
 ```
